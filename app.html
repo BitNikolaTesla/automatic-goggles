@@ -1,0 +1,1962 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI知识库+Chat</title>
+  <!-- 引入字体 -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/vue@3.3.4/dist/vue.global.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Montserrat', 'Noto Sans SC', 'Source Han Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+      font-weight: 500;
+      background-color: #f5f5f5;
+    }
+
+    /* 全局字体设置：英文数字用Montserrat Medium，中文用思源黑体Bold */
+    * {
+      font-variant-numeric: tabular-nums;
+      font-family: 'Montserrat', 'Noto Sans SC', 'Source Han Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    }
+
+    /* 中文文字使用思源黑体Bold */
+    *:lang(zh), *:lang(zh-CN) {
+      font-family: 'Noto Sans SC', 'Source Han Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+      font-weight: 700;
+    }
+
+    .app-container {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      background-color: #f5f5f5;
+    }
+
+    /* 顶部导航栏 */
+    .top-nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 78px;
+      background: #fdfdfd;
+      border-bottom: 2px solid #f7f7f7;
+      padding: 0 31px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    .nav-left {
+      display: flex;
+      align-items: center;
+    }
+
+    .logo-container {
+      width: 26vh;
+      height: 26vh;
+      min-width: 182px;
+      min-height: 182px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: transparent;
+      border-radius: 10px;
+    }
+
+    .logo {
+      width: 90%;
+      height: 90%;
+      object-fit: contain;
+    }
+
+    .nav-center {
+      display: flex;
+      align-items: center;
+      flex: 1;
+      justify-content: center;
+    }
+
+    .nav-tabs {
+      display: flex;
+      background: #f8f9fa;
+      border-radius: 50px;
+      border: 2px solid #e3e3e3;
+      padding: 6px;
+      gap: 8px;
+    }
+
+    .nav-tab {
+      padding: 10px 21px;
+      border: none;
+      background: #f8f9fa;
+      border-radius: 50px;
+      font-size: 18px;
+      font-family: 'Montserrat', 'Noto Sans SC', 'Source Han Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+      font-weight: 700;
+      color: #666;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .nav-tab:hover {
+      background: rgba(0, 0, 0, 0.05);
+      color: #333;
+    }
+
+    .nav-tab.active {
+      background: #fafbf8;
+      color: #000000;
+      border-radius: 50px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      position: relative;
+    }
+
+
+
+         .nav-right {
+       display: flex;
+       align-items: center;
+       gap: 12px;
+     }
+
+     .nav-item {
+       display: flex;
+       align-items: center;
+       gap: 6px;
+       padding: 8px 12px;
+       background: #f8f9fa;
+       border-radius: 8px;
+       cursor: pointer;
+       transition: all 0.2s ease;
+     }
+
+     .nav-item:hover {
+       background: #e9ecef;
+     }
+
+     .nav-icon {
+       flex-shrink: 0;
+       object-fit: contain;
+     }
+
+     .nav-text {
+       font-size: 14px;
+       font-family: 'Montserrat', 'Noto Sans SC', 'Source Han Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+       font-weight: 500;
+       color: #666;
+       white-space: nowrap;
+     }
+
+    .login-icon {
+      width: 52px;
+      height: 52px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #f8f9fa;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      color: #666;
+    }
+
+    .login-icon:hover {
+      background: #e9ecef;
+    }
+
+    /* 主要内容区域 */
+    .main-content {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    /* 左侧面板 */
+    .left-panel {
+      width: 280px;
+      min-width: 200px;
+      max-width: 500px;
+      background: white;
+      border-right: 1px solid #e5e5e5;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    /* 拖拽调整器 */
+    .resize-handle {
+      position: absolute;
+      top: 0;
+      right: -3px;
+      width: 6px;
+      height: 100%;
+      cursor: col-resize;
+      background: transparent;
+      z-index: 10;
+    }
+
+    .resize-handle:hover {
+      background: rgba(64, 158, 255, 0.3);
+    }
+
+    .resize-handle:active {
+      background: rgba(64, 158, 255, 0.5);
+    }
+
+    .knowledge-base {
+      flex: 1;
+      padding: 16px;
+      overflow-y: auto;
+    }
+
+    .section-title {
+      font-size: 17px;
+      font-family: 'Montserrat', 'Noto Sans SC', 'Source Han Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+      font-weight: 700;
+      color: #333;
+      margin-bottom: 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #f0f0f0;
+    }
+
+    .tree-container {
+      margin-top: 8px;
+    }
+
+    .tree-node {
+      margin-bottom: 2px;
+    }
+
+    .tree-node.folder .children {
+      margin-left: 20px;
+      margin-top: 4px;
+    }
+
+    .node-content {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 4px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+
+    .node-content:hover {
+      background: #f5f7fa;
+    }
+
+    .expand-icon {
+      color: #666;
+      transition: transform 0.2s ease;
+      flex-shrink: 0;
+      width: 16px;
+      height: 16px;
+    }
+
+    .expand-icon.expanded {
+      transform: rotate(90deg);
+    }
+
+    .tree-node.file .node-content {
+      padding-left: 24px;
+    }
+
+    .node-icon {
+      flex-shrink: 0;
+      width: 16px;
+      height: 16px;
+      object-fit: contain;
+    }
+
+         .node-label {
+       font-size: 15px;
+       font-family: 'Montserrat', 'Noto Sans SC', 'Source Han Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+       font-weight: 700;
+       color: #333;
+       flex: 1;
+       overflow: hidden;
+       text-overflow: ellipsis;
+       white-space: nowrap;
+     }
+
+     /* 二级目录（文件）字体样式调整 */
+     .tree-node.file .node-label {
+       font-size: 13.5px;
+       color: #6b6b69;
+     }
+
+     /* 三级目录（章节）样式 */
+     .tree-node.section .node-content {
+       padding-left: 44px;
+     }
+
+     .tree-node.section .node-label {
+       font-size: 13.5px;
+       color: #999;
+       font-weight: 400;
+     }
+
+     .tree-node.section .node-content:hover {
+       background: #f8f9fa;
+     }
+
+
+
+    /* 底部功能区 */
+    .bottom-actions {
+      padding: 16px;
+      border-top: 1px solid #f0f0f0;
+      background: #fafafa;
+    }
+
+    .action-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+      margin-bottom: 8px;
+      background: white;
+      border: 1px solid #e5e5e5;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .action-item:last-child {
+      margin-bottom: 0;
+    }
+
+    .action-item:hover {
+      border-color: #409eff;
+      box-shadow: 0 2px 8px rgba(64, 158, 255, 0.1);
+    }
+
+    .action-content {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+         .action-icon {
+       color: #666;
+       flex-shrink: 0;
+       width: 16px;
+       height: 16px;
+       object-fit: contain;
+     }
+
+    .action-text {
+      font-size: 14px;
+      font-family: 'Montserrat', 'Noto Sans SC', 'Source Han Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+      font-weight: 700;
+      color: #333;
+    }
+
+    .action-plus {
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #f8f9fa;
+      border-radius: 4px;
+      color: #666;
+    }
+
+    /* 订阅信息模块 */
+    .subscription-info {
+      padding: 16px;
+      background: #f9f9f9;
+      border-top: 1px solid #e5e5e5;
+    }
+
+    .subscription-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .subscription-icon {
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .subscription-details {
+      flex: 1;
+    }
+
+    .subscription-plan {
+      font-size: 15px;
+      font-family: 'Montserrat', 'Noto Sans SC', 'Source Han Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+      font-weight: 600;
+      color: #333;
+    }
+
+    .upgrade-btn {
+      padding: 4px 12px;
+      background: #e5e5e5;
+      border: none;
+      border-radius: 12px;
+      font-size: 11px;
+      font-family: 'Montserrat', 'Noto Sans SC', 'Source Han Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+      font-weight: 500;
+      color: #666;
+      cursor: pointer;
+      transition: background 0.2s ease;
+      white-space: nowrap;
+    }
+
+    .upgrade-btn:hover {
+      background: #d0d0d0;
+    }
+
+    .subscription-usage {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      margin-left: 0; /* 与图标左侧对齐 */
+      margin-bottom: 12px;
+      padding-left: 0;
+    }
+
+    .usage-item {
+      font-size: 12px;
+      font-family: 'Montserrat', 'Noto Sans SC', 'Source Han Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+      color: #888;
+      line-height: 1.4;
+    }
+
+    /* 进度条部分 */
+    .progress-section {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .progress-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .progress-label {
+      font-size: 11px;
+      color: #666;
+      min-width: 60px;
+      font-family: 'Montserrat', 'Noto Sans SC', 'Source Han Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    }
+
+    .progress-bar {
+      flex: 1;
+      height: 6px;
+      background: #e5e5e5;
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      border-radius: 3px;
+      transition: width 0.3s ease;
+    }
+
+    .storage-progress {
+      background: #333333;
+    }
+
+    .token-progress {
+      background: #333333;
+    }
+
+    .progress-text {
+      font-size: 11px;
+      color: #666;
+      min-width: 30px;
+      text-align: right;
+      font-family: 'Montserrat', 'Noto Sans SC', 'Source Han Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    }
+
+    /* 右侧内容区域 */
+    .right-content {
+      flex: 1;
+      background: white;
+      display: flex;
+      flex-direction: row;
+      gap: 1px;
+    }
+
+    .knowledge-fragments {
+      width: 60%;
+      min-width: 300px;
+      max-width: 80%;
+      padding: 24px;
+      overflow-y: auto;
+      border-right: 1px solid #e5e5e5;
+    }
+
+    /* PDF阅读器/内容查看器 */
+    .content-viewer {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      background: #fafafa;
+      position: relative;
+    }
+
+    /* 内容区域拖拽调整器 */
+    .content-resize-handle {
+      position: absolute;
+      top: 0;
+      left: -3px;
+      width: 6px;
+      height: 100%;
+      cursor: col-resize;
+      background: transparent;
+      z-index: 10;
+    }
+
+    .content-resize-handle:hover {
+      background: rgba(64, 158, 255, 0.3);
+    }
+
+    .content-resize-handle:active {
+      background: rgba(64, 158, 255, 0.5);
+    }
+
+    /* 头部区域 */
+    .fragments-header {
+      margin-bottom: 20px;
+      border-bottom: 1px solid #f0f0f0;
+      padding-bottom: 16px;
+    }
+
+    .fragments-title {
+      font-size: 20px;
+      font-family: 'Montserrat', 'Noto Sans SC', 'Source Han Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+      font-weight: 600;
+      color: #333;
+      margin: 0 0 8px 0;
+    }
+
+    .fragments-summary {
+      font-size: 14px;
+      color: #666;
+      font-family: 'Montserrat', 'Noto Sans SC', 'Source Han Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    }
+
+    /* 片段列表 */
+    .fragments-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    /* 标题栏 */
+    .fragments-header-row {
+      display: flex;
+      align-items: center;
+      padding: 12px 16px;
+      background: #f5f6fa;
+      border: 1px solid #e5e5e5;
+      border-radius: 8px;
+      font-weight: 600;
+      color: #333;
+      font-size: 14px;
+      font-family: 'Montserrat', 'Noto Sans SC', 'Source Han Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+      margin-bottom: 8px;
+    }
+
+    .header-checkbox {
+      margin-right: 12px;
+    }
+
+    .header-checkbox input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      cursor: pointer;
+    }
+
+    .header-name {
+      flex: 1.5;
+      margin-right: 12px;
+    }
+
+    .header-tags {
+      flex: 2;
+      margin-right: 12px;
+    }
+
+    .header-status {
+      flex: 1;
+      margin-right: 12px;
+    }
+
+    .header-enable {
+      width: 80px;
+      margin-right: 12px;
+      text-align: center;
+    }
+
+    .header-actions {
+      width: 180px;
+      text-align: center;
+    }
+
+    .fragment-item {
+      display: flex;
+      align-items: center;
+      padding: 16px;
+      background: #fafafa;
+      border: 1px solid #e5e5e5;
+      border-radius: 8px;
+      transition: all 0.2s ease;
+    }
+
+    .fragment-item:hover {
+      background: #f5f7fa;
+      border-color: #d0d0d0;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+
+    /* 复选框 */
+    .fragment-checkbox {
+      margin-right: 12px;
+    }
+
+    .fragment-checkbox input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      cursor: pointer;
+    }
+
+    /* 名称 */
+    .fragment-name {
+      flex: 1.5;
+      margin-right: 12px;
+    }
+
+    .fragment-name label {
+      font-size: 15px;
+      font-family: 'Montserrat', 'Noto Sans SC', 'Source Han Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+      font-weight: 500;
+      color: #333;
+      cursor: pointer;
+    }
+
+    /* 标签 */
+    .fragment-tags {
+      flex: 2;
+      display: flex;
+      gap: 6px;
+      margin-right: 12px;
+      flex-wrap: wrap;
+    }
+
+    .tag {
+      display: inline-block;
+      padding: 4px 8px;
+      background: #e3f2fd;
+      color: #1976d2;
+      border-radius: 12px;
+      font-size: 12px;
+      font-family: 'Montserrat', 'Noto Sans SC', 'Source Han Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+
+    /* 解析状态 */
+    .fragment-status {
+      flex: 1;
+      margin-right: 12px;
+    }
+
+    /* 启用开关列 */
+    .fragment-enable {
+      width: 80px;
+      margin-right: 12px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .status-badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-family: 'Montserrat', 'Noto Sans SC', 'Source Han Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+
+    .status-success {
+      background: #e8f5e8;
+      color: #2e7d32;
+    }
+
+    .status-cancelled {
+      background: #fff3e0;
+      color: #f57c00;
+    }
+
+    .status-failed {
+      background: #ffebee;
+      color: #d32f2f;
+    }
+
+    /* 动作按钮 */
+    .fragment-actions {
+      display: flex;
+      gap: 8px;
+      width: 180px;
+      justify-content: flex-start;
+    }
+
+    .action-btn {
+      width: 32px;
+      height: 32px;
+      border: none;
+      border-radius: 6px;
+      background: #f8f9fa;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+    }
+
+    .action-btn:hover {
+      background: #e9ecef;
+      transform: translateY(-1px);
+    }
+
+    .action-btn img {
+      object-fit: contain;
+      opacity: 0.7;
+    }
+
+    .action-btn:hover img {
+      opacity: 1;
+    }
+
+    /* 开关按钮样式 */
+    .toggle-switch {
+      width: 40px;
+      height: 20px;
+      background: #ddd;
+      border-radius: 20px;
+      position: relative;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    .toggle-switch.active {
+      background: #333;
+    }
+
+    .toggle-slider {
+      width: 16px;
+      height: 16px;
+      background: white;
+      border-radius: 50%;
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      transition: transform 0.3s ease;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    .toggle-switch.active .toggle-slider {
+      transform: translateX(20px);
+    }
+
+    /* 空状态 */
+    .empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 60px 20px;
+      text-align: center;
+    }
+
+    .empty-icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+      opacity: 0.5;
+    }
+
+    .empty-text {
+      font-size: 18px;
+      font-family: 'Montserrat', 'Noto Sans SC', 'Source Han Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+      font-weight: 600;
+      color: #666;
+      margin-bottom: 8px;
+    }
+
+    .empty-subtitle {
+      font-size: 14px;
+      color: #999;
+      font-family: 'Montserrat', 'Noto Sans SC', 'Source Han Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    }
+
+    /* 内容查看器样式 */
+    .viewer-header {
+      padding: 20px 24px 16px;
+      border-bottom: 1px solid #e5e5e5;
+      background: white;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .viewer-title {
+      font-size: 18px;
+      font-family: 'Montserrat', 'Noto Sans SC', 'Source Han Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+      font-weight: 600;
+      color: #333;
+      margin: 0;
+    }
+
+    .viewer-tools {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .tool-btn {
+      width: 32px;
+      height: 32px;
+      border: 1px solid #d0d0d0;
+      border-radius: 6px;
+      background: white;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      transition: all 0.2s ease;
+    }
+
+    .tool-btn:hover:not(:disabled) {
+      background: #f5f5f5;
+      border-color: #999;
+    }
+
+    .tool-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .zoom-level {
+      font-size: 14px;
+      color: #666;
+      min-width: 40px;
+      text-align: center;
+    }
+
+    .viewer-content {
+      flex: 1;
+      overflow: auto;
+      padding: 24px;
+      background: white;
+    }
+
+    /* 纯文字内容样式 */
+    .text-content {
+      transform-origin: top left;
+      transition: transform 0.3s ease;
+      background: white;
+      padding: 24px;
+    }
+
+    .text-page {
+      max-width: 800px;
+      margin: 0 auto;
+      font-family: 'Montserrat', 'Noto Sans SC', 'Source Han Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+      line-height: 1.6;
+    }
+
+    .content-title {
+      font-size: 24px;
+      font-weight: 700;
+      color: #333;
+      margin-bottom: 24px;
+      border-bottom: 1px solid #e5e5e5;
+      padding-bottom: 12px;
+    }
+
+    /* 知识片段定位区域 - 黑色背景白色文字 */
+    .fragment-location {
+      background: #000000;
+      color: #ffffff;
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 32px;
+    }
+
+    .location-header {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 16px;
+      border-bottom: 1px solid #333;
+      padding-bottom: 8px;
+    }
+
+    .location-content p {
+      margin-bottom: 8px;
+      font-size: 14px;
+    }
+
+    .location-content strong {
+      color: #ffffff;
+      font-weight: 600;
+    }
+
+    /* 文档内容区域 */
+    .document-text {
+      color: #333;
+    }
+
+    .document-text h3 {
+      font-size: 20px;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 20px;
+    }
+
+    .text-body {
+      font-size: 16px;
+      line-height: 1.8;
+      color: #444;
+    }
+
+    .text-body p {
+      margin-bottom: 16px;
+    }
+
+    .text-body h4 {
+      font-size: 18px;
+      font-weight: 600;
+      color: #333;
+      margin: 24px 0 12px 0;
+    }
+
+    .text-body ul, .text-body ol {
+      margin: 16px 0;
+      padding-left: 24px;
+    }
+
+    .text-body li {
+      margin-bottom: 8px;
+    }
+
+    /* 查看器空状态 */
+    .viewer-empty {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 60px 20px;
+      text-align: center;
+      background: white;
+    }
+
+    .empty-viewer-icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+      opacity: 0.5;
+    }
+
+    .empty-viewer-text {
+      font-size: 16px;
+      font-family: 'Montserrat', 'Noto Sans SC', 'Source Han Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+      font-weight: 600;
+      color: #666;
+      margin-bottom: 8px;
+    }
+
+    .empty-viewer-subtitle {
+      font-size: 14px;
+      color: #999;
+      font-family: 'Montserrat', 'Noto Sans SC', 'Source Han Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    /* 自定义滚动条样式 */
+    .knowledge-base::-webkit-scrollbar,
+    .knowledge-fragments::-webkit-scrollbar,
+    .viewer-content::-webkit-scrollbar {
+      width: 5px;
+    }
+
+    /* 知识库目录滚动条 */
+    .knowledge-base::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 0;
+    }
+
+    .knowledge-base::-webkit-scrollbar-thumb {
+      background: #000000;
+      border-radius: 0;
+      transition: background 0.3s ease;
+    }
+
+    .knowledge-base::-webkit-scrollbar-thumb:hover {
+      background: #333333;
+    }
+
+    .knowledge-base::-webkit-scrollbar-thumb:active {
+      background: #000000;
+    }
+
+    /* 知识片段列表滚动条 */
+    .knowledge-fragments::-webkit-scrollbar-track {
+      background: #ffffff;
+      border-radius: 0;
+    }
+
+    .knowledge-fragments::-webkit-scrollbar-thumb {
+      background: #000000;
+      border-radius: 0;
+      transition: background 0.3s ease;
+    }
+
+    .knowledge-fragments::-webkit-scrollbar-thumb:hover {
+      background: #333333;
+    }
+
+    .knowledge-fragments::-webkit-scrollbar-thumb:active {
+      background: #000000;
+    }
+
+    /* 内容预览区域滚动条 */
+    .viewer-content::-webkit-scrollbar-track {
+      background: #ffffff;
+      border-radius: 0;
+    }
+
+    .viewer-content::-webkit-scrollbar-thumb {
+      background: #000000;
+      border-radius: 0;
+      transition: background 0.3s ease;
+    }
+
+    .viewer-content::-webkit-scrollbar-thumb:hover {
+      background: #333333;
+    }
+
+    .viewer-content::-webkit-scrollbar-thumb:active {
+      background: #000000;
+    }
+
+    /* 滚动条角落 */
+    .knowledge-base::-webkit-scrollbar-corner {
+      background: #f1f1f1;
+    }
+
+    .knowledge-fragments::-webkit-scrollbar-corner,
+    .viewer-content::-webkit-scrollbar-corner {
+      background: #ffffff;
+    }
+
+    /* 隐藏滚动条按钮 */
+    .knowledge-base::-webkit-scrollbar-button,
+    .knowledge-fragments::-webkit-scrollbar-button,
+    .viewer-content::-webkit-scrollbar-button {
+      display: none;
+    }
+
+    /* Firefox 滚动条样式 */
+    .knowledge-base {
+      scrollbar-width: thin;
+      scrollbar-color: #000000 #f1f1f1;
+    }
+
+    .knowledge-fragments,
+    .viewer-content {
+      scrollbar-width: thin;
+      scrollbar-color: #000000 #ffffff;
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <div class="app-container">
+      <!-- 顶部导航栏 -->
+      <header class="top-nav">
+        <div class="nav-left">
+          <div class="logo-container">
+            <img src="./logo.png" alt="Logo" class="logo" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+            <svg class="logo" width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" style="display: none;">
+              <path d="M8 12h4v4H8v-4zm6 0h4v4h-4v-4zm6 0h4v4h-4v-4zM8 18h4v4H8v-4zm6 0h4v4h-4v-4zm6 0h4v4h-4v-4z" fill="white"/>
+            </svg>
+          </div>
+        </div>
+        
+        <div class="nav-center">
+          <div class="nav-tabs">
+            <button 
+              v-for="tab in navTabs" 
+              :key="tab.key"
+              :class="['nav-tab', { active: activeTab === tab.key }]"
+              @click="activeTab = tab.key"
+            >
+              {{ tab.label }}
+            </button>
+          </div>
+        </div>
+        
+                 <div class="nav-right">
+           <!-- 语言选择 -->
+           <div class="nav-item language-selector">
+             <img src="./文件图标/地球.png" alt="语言" width="20" height="20" class="nav-icon" />
+             <span class="nav-text">简体中文</span>
+           </div>
+           
+           <!-- 设置 -->
+           <div class="nav-item settings-btn">
+             <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" class="nav-icon">
+               <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+             </svg>
+           </div>
+           
+           <!-- GitHub -->
+           <div class="nav-item github-btn">
+             <img src="./文件图标/github.png" alt="GitHub" width="20" height="20" class="nav-icon" />
+           </div>
+           
+           <!-- 用户登录 -->
+           <div class="login-icon">
+             <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+               <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+             </svg>
+           </div>
+         </div>
+      </header>
+
+      <!-- 主要内容区域 -->
+      <main class="main-content">
+              <!-- 左侧面板 -->
+      <aside class="left-panel" id="leftPanel">
+        <!-- 拖拽调整器 -->
+        <div class="resize-handle" id="resizeHandle"></div>
+        <!-- 知识库目录 -->
+          <div class="knowledge-base">
+            <div class="section-title">知识库目录</div>
+            <div class="tree-container">
+              <div class="tree-node folder" v-for="folder in knowledgeTree" :key="folder.id">
+                                 <div class="node-content" @click="toggleFolder(folder.id)">
+                   <img class="expand-icon" :class="{ expanded: folder.expanded }" src="./文件图标/文件夹箭头2.png" alt="展开箭头" width="16" height="16" 
+                        onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';" />
+                   <svg class="expand-icon" :class="{ expanded: folder.expanded }" width="16" height="16" viewBox="0 0 16 16" fill="currentColor" style="display: none;">
+                     <path d="M6 12l4-4-4-4v8z"/>
+                   </svg>
+                  <img class="node-icon" :src="getFileIcon(folder.label, folder.type)" :alt="folder.type" />
+                  <span class="node-label">{{ folder.label }}</span>
+                </div>
+                                 <div class="children" :class="{ hidden: !folder.expanded }" v-if="folder.children">
+                   <div class="tree-node file" v-for="file in folder.children" :key="file.id">
+                     <div class="node-content" @click="toggleFile(file.id)">
+                       <img class="expand-icon" :class="{ expanded: file.expanded }" src="./文件图标/文件夹箭头.png" alt="展开箭头" width="16" height="16" />
+                       <img class="node-icon" :src="getFileIcon(file.label, file.type)" :alt="file.type" />
+                       <span class="node-label">{{ file.label }}</span>
+                     </div>
+                     <div class="children" :class="{ hidden: !file.expanded }" v-if="file.sections">
+                       <div class="tree-node section" v-for="section in file.sections" :key="section.id">
+                         <div class="node-content">
+                           <img class="node-icon" src="./文件图标/原点.png" alt="章节" width="16" height="16" />
+                           <span class="node-label">{{ section.label }}</span>
+                         </div>
+                       </div>
+                     </div>
+                   </div>
+                 </div>
+              </div>
+            </div>
+          </div>
+
+                     <!-- 底部功能区 -->
+           <div class="bottom-actions">
+             <div class="action-item" @click="handleUpload">
+               <div class="action-content">
+                 <img class="action-icon" src="./文件图标/上传.png" alt="上传" width="16" height="16" />
+                 <span class="action-text">上传文件</span>
+               </div>
+               <div class="action-plus">
+                 <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                   <path d="M8 4a.5.5 0 01.5.5v3h3a.5.5 0 010 1h-3v3a.5.5 0 01-1 0v-3h-3a.5.5 0 010-1h3v-3A.5.5 0 018 4z"/>
+                 </svg>
+               </div>
+             </div>
+             
+             <div class="action-item" @click="handleFragmentManagement">
+               <div class="action-content">
+                 <img class="action-icon" src="./文件图标/碎片.png" alt="碎片" width="16" height="16" />
+                 <span class="action-text">碎片知识管理</span>
+               </div>
+               <div class="action-plus">
+                 <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                   <path d="M8 4a.5.5 0 01.5.5v3h3a.5.5 0 010 1h-3v3a.5.5 0 01-1 0v-3h-3a.5.5 0 010-1h3v-3A.5.5 0 018 4z"/>
+                 </svg>
+               </div>
+             </div>
+           </div>
+
+           <!-- 账户会员信息 -->
+           <div class="subscription-info">
+             <div class="subscription-header">
+               <img src="./图标文件夹/订阅图标.png" alt="订阅" width="20" height="20" class="subscription-icon" />
+               <div class="subscription-details">
+                 <div class="subscription-plan">Pro Trail 套餐</div>
+               </div>
+               <button class="upgrade-btn">升级计划</button>
+             </div>
+             
+             <!-- 使用信息区域 -->
+             <div class="subscription-usage">
+               <div class="usage-item">储存空间：256.0MB/2.0GB</div>
+ 
+             </div>
+             
+             <!-- 进度条 -->
+             <div class="progress-section">
+               <div class="progress-item">
+                 <div class="progress-label">储存空间</div>
+                 <div class="progress-bar">
+                   <div class="progress-fill storage-progress" style="width: 12.8%"></div>
+                 </div>
+                 <div class="progress-text">12.8%</div>
+               </div>
+               
+               <div class="progress-item">
+                 <div class="progress-label">TOKEN 使用</div>
+                 <div class="progress-bar">
+                   <div class="progress-fill token-progress" style="width: 30%"></div>
+                 </div>
+                 <div class="progress-text">30%</div>
+               </div>
+             </div>
+           </div>
+        </aside>
+
+                 <!-- 右侧内容区域 -->
+         <section class="right-content">
+           <!-- 左侧：知识片段列表 -->
+           <div class="knowledge-fragments">
+             <!-- 头部标题 -->
+             <div class="fragments-header">
+               <h2 class="fragments-title">{{ selectedFileTitle || '请选择文件查看知识片段' }}</h2>
+               <div class="fragments-summary">
+                 共 {{ knowledgeFragments.length }} 个知识片段
+               </div>
+             </div>
+
+             <!-- 片段列表 -->
+             <div class="fragments-list" v-if="knowledgeFragments.length > 0">
+               <!-- 标题栏 -->
+               <div class="fragments-header-row">
+                 <div class="header-checkbox">
+                   <input type="checkbox" id="selectAll" @change="toggleSelectAll" :checked="isAllSelected">
+                 </div>
+                 <div class="header-name">名称</div>
+                 <div class="header-tags">标签</div>
+                 <div class="header-status">解析状态</div>
+                 <div class="header-enable">启用</div>
+                 <div class="header-actions">操作</div>
+               </div>
+               
+               <div class="fragment-item" v-for="fragment in knowledgeFragments" :key="fragment.id">
+                 <!-- 复选框 -->
+                 <div class="fragment-checkbox">
+                   <input type="checkbox" :id="'checkbox-' + fragment.id" v-model="fragment.selected">
+                 </div>
+
+                 <!-- 名称 -->
+                 <div class="fragment-name">
+                   <label :for="'checkbox-' + fragment.id">{{ fragment.name }}</label>
+                 </div>
+
+                 <!-- 标签 -->
+                 <div class="fragment-tags">
+                   <span class="tag" v-for="tag in fragment.tags" :key="tag">{{ tag }}</span>
+                 </div>
+
+                 <!-- 解析状态 -->
+                 <div class="fragment-status">
+                   <span class="status-badge" :class="'status-' + fragment.status">
+                     {{ getStatusText(fragment.status) }}
+                   </span>
+                 </div>
+
+                 <!-- 启用开关 -->
+                 <div class="fragment-enable">
+                   <div class="toggle-switch" :class="{ active: fragment.enabled }" @click="toggleEnable(fragment)">
+                     <div class="toggle-slider"></div>
+                   </div>
+                 </div>
+
+                 <!-- 动作按钮 -->
+                 <div class="fragment-actions">
+                   <button class="action-btn link-btn" @click="showLink(fragment)">
+                     <img src="./图标文件夹/链接.png" alt="链接" width="16" height="16" />
+                   </button>
+                   <button class="action-btn view-btn" @click="viewFragment(fragment)">
+                     <img src="./图标文件夹/查看.png" alt="查看" width="16" height="16" />
+                   </button>
+                   <button class="action-btn edit-btn" @click="editFragment(fragment)">
+                     <img src="./图标文件夹/编辑.png" alt="编辑" width="16" height="16" />
+                   </button>
+                   <button class="action-btn delete-btn" @click="deleteFragment(fragment)">
+                     <img src="./图标文件夹/删除.png" alt="删除" width="16" height="16" />
+                   </button>
+                 </div>
+               </div>
+             </div>
+
+             <!-- 空状态 -->
+             <div class="empty-state" v-else>
+               <div class="empty-icon">📄</div>
+               <div class="empty-text">暂无知识片段</div>
+               <div class="empty-subtitle">请在左侧选择文件查看其知识片段</div>
+             </div>
+           </div>
+
+           <!-- 右侧：PDF阅读器/文字显示区域 -->
+           <div class="content-viewer" id="contentViewer">
+             <!-- 拖拽调整器 -->
+             <div class="content-resize-handle" id="contentResizeHandle"></div>
+             <!-- 查看器头部 -->
+             <div class="viewer-header">
+               <h3 class="viewer-title">{{ currentFragment ? currentFragment.name : '内容预览' }}</h3>
+               <div class="viewer-tools">
+                 <button class="tool-btn" @click="zoomOut" :disabled="!currentFragment">
+                   <span>-</span>
+                 </button>
+                 <span class="zoom-level">{{ zoomLevel }}%</span>
+                 <button class="tool-btn" @click="zoomIn" :disabled="!currentFragment">
+                   <span>+</span>
+                 </button>
+                 <button class="tool-btn" @click="resetZoom" :disabled="!currentFragment">
+                   <span>重置</span>
+                 </button>
+               </div>
+             </div>
+
+             <!-- 内容显示区域 -->
+             <div class="viewer-content" v-if="currentFragment">
+               <!-- 纯文字内容 -->
+               <div class="text-content" :style="{ transform: `scale(${zoomLevel / 100})` }">
+                 <div class="text-page">
+                   <h2 class="content-title">{{ currentFragment.name }}</h2>
+                   
+                   <!-- 知识片段定位部分 -->
+                   <div class="fragment-location">
+                     <div class="location-header">知识片段定位</div>
+                     <div class="location-content">
+                       <p><strong>文档：</strong>产品需求文档V2.1.PDF</p>
+                       <p><strong>章节：</strong>{{ currentFragment.name }}</p>
+                       <p><strong>页码：</strong>第{{ Math.floor(Math.random() * 50) + 1 }}页</p>
+                       <p><strong>定位：</strong>{{ currentFragment.locationInfo }}</p>
+                     </div>
+                   </div>
+                   
+                   <!-- 文档内容 -->
+                   <div class="document-text">
+                     <h3>{{ currentFragment.name }}</h3>
+                     <div class="text-body" v-html="currentFragment.textContent"></div>
+                   </div>
+                 </div>
+               </div>
+             </div>
+
+             <!-- 空状态 -->
+             <div class="viewer-empty" v-else>
+               <div class="empty-viewer-icon">👁️</div>
+               <div class="empty-viewer-text">点击左侧知识片段的"查看"按钮</div>
+               <div class="empty-viewer-subtitle">在此处预览片段内容</div>
+             </div>
+           </div>
+         </section>
+      </main>
+    </div>
+  </div>
+
+  <script>
+    console.log('Vue:', Vue)
+    
+    if (typeof Vue === 'undefined') {
+      console.error('Vue is not loaded!')
+      document.body.innerHTML = '<h1>Vue加载失败，请检查网络连接</h1>'
+    } else {
+      console.log('Vue loaded successfully')
+    }
+    
+    const { createApp } = Vue
+
+    const app = createApp({
+      data() {
+        return {
+          navTabs: [
+            { key: 'knowledge', label: '知识库' },
+            { key: 'chat', label: '聊天' },
+            { key: 'document', label: '文档管理' },
+            { key: 'config', label: '配置' }
+          ],
+          activeTab: 'knowledge',
+          selectedFileTitle: '',
+          knowledgeFragments: [],
+          currentFragment: null,
+          zoomLevel: 100,
+          knowledgeTree: [
+                         {
+               id: 1,
+               label: '技术文档',
+               type: 'folder',
+               expanded: true,
+               children: [
+                 { 
+                   id: 11, 
+                   label: 'Vue.js开发指南.pdf', 
+                   type: 'file',
+                   expanded: false,
+                   sections: [
+                     { id: 111, label: '1.Vue基础概念' },
+                     { id: 112, label: '2.组件开发' },
+                     { id: 113, label: '3.路由管理' },
+                     { id: 114, label: '4.状态管理' },
+                     { id: 115, label: '5.项目构建' }
+                   ]
+                 },
+                 { 
+                   id: 12, 
+                   label: 'JavaScript高级编程.docx', 
+                   type: 'file',
+                   expanded: false,
+                   sections: [
+                     { id: 121, label: '1.基础语法' },
+                     { id: 122, label: '2.面向对象编程' },
+                     { id: 123, label: '3.异步编程' },
+                     { id: 124, label: '4.模块系统' },
+                     { id: 125, label: '5.性能优化' }
+                   ]
+                 },
+                 { 
+                   id: 13, 
+                   label: 'CSS3样式手册.md', 
+                   type: 'file',
+                   expanded: false,
+                   sections: [
+                     { id: 131, label: '1.选择器详解' },
+                     { id: 132, label: '2.布局技术' },
+                     { id: 133, label: '3.动画效果' },
+                     { id: 134, label: '4.响应式设计' }
+                   ]
+                 },
+                 { 
+                   id: 14, 
+                   label: 'React组件设计.html', 
+                   type: 'file',
+                   expanded: false,
+                   sections: [
+                     { id: 141, label: '1.组件基础' },
+                     { id: 142, label: '2.Props与State' },
+                     { id: 143, label: '3.生命周期' },
+                     { id: 144, label: '4.Hooks使用' }
+                   ]
+                 },
+                 { 
+                   id: 15, 
+                   label: 'TypeScript教程.txt', 
+                   type: 'file',
+                   expanded: false,
+                   sections: [
+                     { id: 151, label: '1.类型系统' },
+                     { id: 152, label: '2.接口定义' },
+                     { id: 153, label: '3.泛型编程' },
+                     { id: 154, label: '4.装饰器' }
+                   ]
+                 }
+               ]
+             },
+                         {
+               id: 2,
+               label: '产品规格',
+               type: 'folder',
+               expanded: true,
+               children: [
+                 { 
+                   id: 21, 
+                   label: '产品需求文档v2.1.pdf', 
+                   type: 'file',
+                   expanded: false,
+                   sections: [
+                     { id: 211, label: '1.文档概述' },
+                     { id: 212, label: '2.产品背景' },
+                     { id: 213, label: '3.市场分析' },
+                     { id: 214, label: '4.用户画像' },
+                     { id: 215, label: '5.功能需求' },
+                     { id: 216, label: '6.非功能需求' },
+                     { id: 217, label: '7.数据需求' },
+                     { id: 218, label: '8.技术要求' },
+                     { id: 219, label: '9.系统架构' },
+                     { id: 2110, label: '10.风险评估' },
+                     { id: 2111, label: '11.实施计划' }
+                   ]
+                 },
+                 { 
+                   id: 22, 
+                   label: '原型设计稿.fig', 
+                   type: 'file',
+                   expanded: false,
+                   sections: [
+                     { id: 221, label: '1.首页设计' },
+                     { id: 222, label: '2.用户中心' },
+                     { id: 223, label: '3.功能页面' },
+                     { id: 224, label: '4.交互效果' }
+                   ]
+                 },
+                 { 
+                   id: 23, 
+                   label: '用户体验报告.docx', 
+                   type: 'file',
+                   expanded: false,
+                   sections: [
+                     { id: 231, label: '1.用户调研' },
+                     { id: 232, label: '2.可用性测试' },
+                     { id: 233, label: '3.体验问题' },
+                     { id: 234, label: '4.优化建议' }
+                   ]
+                 },
+                 { 
+                   id: 24, 
+                   label: '竞品分析表.xlsx', 
+                   type: 'file',
+                   expanded: false,
+                   sections: [
+                     { id: 241, label: '1.竞品概览' },
+                     { id: 242, label: '2.功能对比' },
+                     { id: 243, label: '3.优劣分析' },
+                     { id: 244, label: '4.策略建议' }
+                   ]
+                 }
+               ]
+             },
+                         {
+               id: 3,
+               label: '会议记录',
+               type: 'folder',
+               expanded: true,
+               children: [
+                 { 
+                   id: 31, 
+                   label: '2024-01-15 项目启动会.docx', 
+                   type: 'file',
+                   expanded: false,
+                   sections: [
+                     { id: 311, label: '1.项目介绍' },
+                     { id: 312, label: '2.团队组建' },
+                     { id: 313, label: '3.时间规划' },
+                     { id: 314, label: '4.资源分配' }
+                   ]
+                 },
+                 { 
+                   id: 32, 
+                   label: '2024-01-22 需求评审会.pdf', 
+                   type: 'file',
+                   expanded: false,
+                   sections: [
+                     { id: 321, label: '1.需求梳理' },
+                     { id: 322, label: '2.技术评估' },
+                     { id: 323, label: '3.风险分析' },
+                     { id: 324, label: '4.评审结论' }
+                   ]
+                 },
+                 { id: 33, label: '2024-01-29 技术方案讨论.md', type: 'file', expanded: false, sections: [] },
+                 { id: 34, label: '2024-02-05 进度汇报.pptx', type: 'file', expanded: false, sections: [] }
+               ]
+             },
+             {
+               id: 4,
+               label: '设计资源',
+               type: 'folder',
+               expanded: false,
+               children: [
+                 { id: 41, label: 'Logo设计方案.png', type: 'file', expanded: false, sections: [] },
+                 { id: 42, label: 'UI界面截图.jpg', type: 'file', expanded: false, sections: [] },
+                 { id: 43, label: '图标库.svg', type: 'file', expanded: false, sections: [] },
+                 { id: 44, label: '色彩搭配指南.pdf', type: 'file', expanded: false, sections: [] }
+               ]
+             },
+             {
+               id: 5,
+               label: '培训材料',
+               type: 'folder',
+               expanded: false,
+               children: [
+                 { id: 51, label: '新员工入职培训.ppt', type: 'file', expanded: false, sections: [] },
+                 { id: 52, label: '技术培训大纲.docx', type: 'file', expanded: false, sections: [] },
+                 { id: 53, label: '安全规范手册.pdf', type: 'file', expanded: false, sections: [] },
+                 { id: 54, label: '操作流程图.png', type: 'file', expanded: false, sections: [] }
+               ]
+             }
+          ]
+        }
+      },
+      computed: {
+        isAllSelected() {
+          return this.knowledgeFragments.length > 0 && this.knowledgeFragments.every(fragment => fragment.selected)
+        }
+      },
+      methods: {
+        toggleFolder(folderId) {
+          const folder = this.knowledgeTree.find(f => f.id === folderId)
+          if (folder) {
+            folder.expanded = !folder.expanded
+          }
+        },
+        toggleFile(fileId) {
+          // 在所有文件夹中查找文件
+          for (let folder of this.knowledgeTree) {
+            if (folder.children) {
+              const file = folder.children.find(f => f.id === fileId)
+              if (file) {
+                file.expanded = !file.expanded
+                // 如果文件有sections，加载为知识片段
+                if (file.sections && file.sections.length > 0) {
+                  this.loadKnowledgeFragments(file)
+                }
+                break
+              }
+            }
+          }
+        },
+        loadKnowledgeFragments(file) {
+          this.selectedFileTitle = file.label
+          this.currentFragment = null // 重置当前查看的片段
+          this.knowledgeFragments = file.sections.map(section => ({
+            id: section.id,
+            name: section.label,
+            tags: this.generateTags(),
+            status: this.generateStatus(),
+            enabled: Math.random() > 0.3,
+            selected: false,
+            description: this.generateDescription(section.label),
+            locationInfo: this.generateLocationInfo(section.label),
+            textContent: this.generateTextContent(section.label)
+          }))
+        },
+        generateDescription(sectionName) {
+          const descriptions = {
+            '1.文档概述': '本文档为产品需求文档的总体概述，介绍了文档的结构、目的和使用方法。',
+            '2.产品背景': '详细描述了产品的市场背景、商业环境和项目启动的原因。',
+            '3.市场分析': '对目标市场进行深入分析，包括市场规模、竞争格局和发展趋势。',
+            '4.用户画像': '定义了产品的目标用户群体，包括用户特征、需求和行为模式。',
+            '5.功能需求': '详细描述了产品的核心功能和特性需求。'
+          }
+          return descriptions[sectionName] || `这是关于"${sectionName}"的详细描述，包含了相关的业务规则、技术要求和实现细节。`
+        },
+        generateContent(sectionName) {
+          const contents = {
+            '1.文档概述': `
+              <h3>文档目的</h3>
+              <p>本文档旨在明确产品的功能需求、技术要求和业务规则，为后续的设计和开发工作提供指导。</p>
+              <h3>适用范围</h3>
+              <p>本文档适用于产品经理、设计师、开发工程师和测试工程师。</p>
+            `,
+            '2.产品背景': `
+              <h3>市场机会</h3>
+              <p>随着数字化转型的深入，企业对智能化解决方案的需求日益增长。</p>
+              <h3>竞争分析</h3>
+              <p>当前市场上存在多个竞争产品，但在用户体验和功能完整性方面仍有提升空间。</p>
+            `
+          }
+          return contents[sectionName] || `<p>这里是"${sectionName}"的详细内容...</p>`
+        },
+        generateLocationInfo(sectionName) {
+          const locations = {
+            '1.文档概述': '位于文档开头部分，概述章节第1段至第3段',
+            '2.产品背景': '第2章节，包含市场分析和项目背景描述',
+            '3.市场分析': '第3章节第1节，详细市场数据和竞争分析',
+            '4.用户画像': '第3章节第2节，用户研究和画像定义',
+            '5.功能需求': '第4章节，核心功能描述和需求列表'
+          }
+          return locations[sectionName] || `${sectionName}章节，具体位置见文档目录`
+        },
+        generateTextContent(sectionName) {
+          const contents = {
+            '1.文档概述': `
+              <h4>1.1 文档目的</h4>
+              <p>本文档旨在明确智能知识管理系统的产品需求，为产品设计、开发、测试等各个环节提供详细的指导和标准。通过对市场需求、用户痛点、技术可行性等方面的深入分析，确保产品能够满足目标用户的实际需求。</p>
+              
+              <h4>1.2 适用范围</h4>
+              <p>本文档适用于智能知识管理系统项目的所有参与人员，包括：</p>
+              <ul>
+                <li>产品经理：负责需求分析和产品规划</li>
+                <li>设计师：负责用户界面和用户体验设计</li>
+                <li>开发工程师：负责系统架构设计和功能开发</li>
+                <li>测试工程师：负责功能测试和质量保证</li>
+                <li>项目经理：负责项目进度管理和资源协调</li>
+              </ul>
+              
+              <h4>1.3 文档结构</h4>
+              <p>本文档按照从宏观到微观的逻辑结构组织，首先介绍产品背景和市场环境，然后详细描述功能需求和技术要求，最后提供实施计划和风险评估。</p>
+            `,
+            '2.产品背景': `
+              <h4>2.1 项目背景</h4>
+              <p>在信息化快速发展的今天，企业和个人都面临着海量信息处理的挑战。传统的文档管理方式已经无法满足现代工作的需求，迫切需要一个智能化的知识管理解决方案。</p>
+              
+              <h4>2.2 市场机遇</h4>
+              <p>根据最新的市场研究报告，知识管理市场预计在未来五年内将保持15%以上的年增长率。主要驱动因素包括：</p>
+              <ul>
+                <li>远程办公模式的普及，对协作工具的需求增加</li>
+                <li>人工智能技术的成熟，为智能化应用提供了技术基础</li>
+                <li>企业数字化转型的加速，对知识资产管理的重视</li>
+                <li>监管要求的提升，对文档合规性管理的需求</li>
+              </ul>
+              
+              <h4>2.3 目标愿景</h4>
+              <p>我们的目标是打造一个集知识创建、存储、检索、分享于一体的智能化平台，帮助用户高效管理和利用知识资产，提升工作效率和决策质量。</p>
+            `,
+            '3.市场分析': `
+              <h4>3.1 目标市场规模</h4>
+              <p>根据行业分析报告，全球知识管理软件市场规模预计将从2024年的387亿美元增长到2029年的754亿美元，复合年增长率为14.2%。</p>
+              
+              <h4>3.2 竞争格局分析</h4>
+              <p>当前市场主要由以下几类产品占据：</p>
+              <ul>
+                <li><strong>传统文档管理系统：</strong>如SharePoint、Confluence等，功能完善但用户体验较差</li>
+                <li><strong>云端协作平台：</strong>如Notion、Airtable等，界面友好但功能相对简单</li>
+                <li><strong>专业知识库：</strong>如GitBook、Bookstack等，专注于文档编写但缺乏智能化功能</li>
+              </ul>
+              
+              <h4>3.3 市场机会</h4>
+              <p>通过分析现有竞品，我们发现以下市场机会：</p>
+              <ol>
+                <li>智能化程度不足，大多数产品缺乏AI辅助功能</li>
+                <li>用户体验有待提升，操作复杂度较高</li>
+                <li>定制化能力有限，难以满足不同行业的特殊需求</li>
+              </ol>
+            `
+          }
+          return contents[sectionName] || `
+            <p>这里是"${sectionName}"的详细文档内容。本章节包含了相关的业务规则、技术要求和实现细节。</p>
+            <p>内容涵盖了产品功能的详细描述、用户场景分析、技术架构设计等多个方面，为后续的产品开发提供了明确的指导方向。</p>
+            <p>通过深入的需求分析和市场调研，确保产品能够满足目标用户的实际需求，并在竞争激烈的市场中占据优势地位。</p>
+          `
+        },
+        generateTableData() {
+          const tables = [
+            {
+              headers: ['功能模块', '优先级', '开发工时', '责任人'],
+              rows: [
+                ['用户登录', '高', '3天', '张三'],
+                ['数据展示', '中', '5天', '李四'],
+                ['报表导出', '低', '2天', '王五']
+              ]
+            },
+            {
+              headers: ['需求ID', '需求描述', '状态', '版本'],
+              rows: [
+                ['REQ-001', '用户注册功能', '已完成', 'v1.0'],
+                ['REQ-002', '密码重置功能', '开发中', 'v1.1'],
+                ['REQ-003', '多语言支持', '计划中', 'v2.0']
+              ]
+            }
+          ]
+          return tables[Math.floor(Math.random() * tables.length)]
+        },
+        generateTags() {
+          const allTags = ['计算机', '互联网产品', '技术文档', '产品设计', '用户体验', '数据分析', '项目管理', '软件开发']
+          const tagCount = Math.floor(Math.random() * 3) + 2 // 2-4个标签
+          const shuffled = allTags.sort(() => 0.5 - Math.random())
+          return shuffled.slice(0, tagCount)
+        },
+        generateStatus() {
+          const statuses = ['success', 'cancelled', 'failed']
+          const weights = [0.7, 0.2, 0.1] // 成功70%，取消20%，失败10%
+          const random = Math.random()
+          if (random < weights[0]) return 'success'
+          if (random < weights[0] + weights[1]) return 'cancelled'
+          return 'failed'
+        },
+        getStatusText(status) {
+          const statusMap = {
+            'success': '成功',
+            'cancelled': '取消',
+            'failed': '失败'
+          }
+          return statusMap[status] || '未知'
+        },
+        toggleSelectAll() {
+          const shouldSelectAll = !this.isAllSelected
+          this.knowledgeFragments.forEach(fragment => {
+            fragment.selected = shouldSelectAll
+          })
+        },
+        toggleEnable(fragment) {
+          fragment.enabled = !fragment.enabled
+        },
+        showLink(fragment) {
+          alert(`显示链接：${fragment.name}`)
+        },
+        viewFragment(fragment) {
+          this.currentFragment = fragment
+        },
+        zoomIn() {
+          if (this.zoomLevel < 200) {
+            this.zoomLevel += 10
+          }
+        },
+        zoomOut() {
+          if (this.zoomLevel > 50) {
+            this.zoomLevel -= 10
+          }
+        },
+        resetZoom() {
+          this.zoomLevel = 100
+        },
+        editFragment(fragment) {
+          alert(`编辑片段：${fragment.name}`)
+        },
+        deleteFragment(fragment) {
+          if (confirm(`确定要删除片段"${fragment.name}"吗？`)) {
+            const index = this.knowledgeFragments.findIndex(f => f.id === fragment.id)
+            if (index > -1) {
+              this.knowledgeFragments.splice(index, 1)
+            }
+          }
+        },
+        handleUpload() {
+          alert('上传文件功能')
+        },
+                 handleUserManagement() {
+           alert('用户管理功能')
+         },
+         handleFragmentManagement() {
+           alert('碎片知识管理功能')
+         },
+        getFileIcon(fileName, type) {
+          if (type === 'folder') {
+            return './文件图标/文件夹.png'
+          }
+          
+          const extension = fileName.split('.').pop().toLowerCase()
+          const iconMap = {
+            'pdf': './文件图标/pdf文件.png',
+            'doc': './文件图标/word.png',
+            'docx': './文件图标/word.png',
+            'xls': './文件图标/EXCEL.png',
+            'xlsx': './文件图标/EXCEL.png',
+            'ppt': './文件图标/ppt.png',
+            'pptx': './文件图标/ppt.png',
+            'txt': './文件图标/TXT.png',
+            'html': './文件图标/html.png',
+            'htm': './文件图标/html.png',
+            'png': './文件图标/img.png',
+            'jpg': './文件图标/img.png',
+            'jpeg': './文件图标/img.png',
+            'gif': './文件图标/img.png',
+            'bmp': './文件图标/img.png',
+            'svg': './文件图标/img.png',
+            'fig': './文件图标/img.png',
+            'md': './文件图标/TXT.png'
+          }
+          
+          return iconMap[extension] || './文件图标/TXT.png'
+        },
+        initResize() {
+          const resizeHandle = document.getElementById('resizeHandle')
+          const leftPanel = document.getElementById('leftPanel')
+          let isResizing = false
+
+          if (!resizeHandle || !leftPanel) return
+
+          resizeHandle.addEventListener('mousedown', (e) => {
+            isResizing = true
+            document.addEventListener('mousemove', handleMouseMove)
+            document.addEventListener('mouseup', handleMouseUp)
+            document.body.style.cursor = 'col-resize'
+            document.body.style.userSelect = 'none'
+          })
+
+          const handleMouseMove = (e) => {
+            if (!isResizing) return
+            const newWidth = e.clientX
+            if (newWidth >= 200 && newWidth <= 500) {
+              leftPanel.style.width = newWidth + 'px'
+            }
+          }
+
+          const handleMouseUp = () => {
+            isResizing = false
+            document.removeEventListener('mousemove', handleMouseMove)
+            document.removeEventListener('mouseup', handleMouseUp)
+            document.body.style.cursor = ''
+            document.body.style.userSelect = ''
+          }
+        },
+        initContentResize() {
+          const contentResizeHandle = document.getElementById('contentResizeHandle')
+          const knowledgeFragments = document.querySelector('.knowledge-fragments')
+          let isResizing = false
+
+          if (!contentResizeHandle || !knowledgeFragments) return
+
+          contentResizeHandle.addEventListener('mousedown', (e) => {
+            isResizing = true
+            document.addEventListener('mousemove', handleMouseMove)
+            document.addEventListener('mouseup', handleMouseUp)
+            document.body.style.cursor = 'col-resize'
+            document.body.style.userSelect = 'none'
+          })
+
+          const handleMouseMove = (e) => {
+            if (!isResizing) return
+            const rightContent = document.querySelector('.right-content')
+            const rightContentRect = rightContent.getBoundingClientRect()
+            const newWidth = e.clientX - rightContentRect.left
+            const minWidth = 300
+            const maxWidth = rightContentRect.width * 0.8
+            
+            if (newWidth >= minWidth && newWidth <= maxWidth) {
+              const percentage = (newWidth / rightContentRect.width) * 100
+              knowledgeFragments.style.width = percentage + '%'
+            }
+          }
+
+          const handleMouseUp = () => {
+            isResizing = false
+            document.removeEventListener('mousemove', handleMouseMove)
+            document.removeEventListener('mouseup', handleMouseUp)
+            document.body.style.cursor = ''
+            document.body.style.userSelect = ''
+          }
+        }
+      },
+              mounted() {
+          console.log('App mounted, data:', this.$data)
+          this.initResize()
+          this.initContentResize()
+        }
+    })
+    
+    console.log('Mounting app...')
+    app.mount('#app')
+    console.log('App mounted!')
+  </script>
+</body>
+</html>

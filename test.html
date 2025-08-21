@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>测试Vue</title>
+  <script src="https://unpkg.com/vue@3.3.4/dist/vue.global.prod.js"></script>
+</head>
+<body>
+  <div id="app">
+    <h1>{{ message }}</h1>
+    <ul>
+      <li v-for="item in items" :key="item.id">{{ item.name }}</li>
+    </ul>
+  </div>
+
+  <script>
+    const { createApp } = Vue
+    
+    createApp({
+      data() {
+        return {
+          message: 'Hello Vue!',
+          items: [
+            { id: 1, name: '技术文档' },
+            { id: 2, name: '产品规格' }
+          ]
+        }
+      }
+    }).mount('#app')
+  </script>
+</body>
+</html>
+
+
