@@ -1,7 +1,7 @@
 # Forest.AI - 智能知识库解决方案
 
 <p align="center">
-  <img src="./logo.png" alt="Forest.AI Logo" width="120" height="120">
+  <img src="./logo.png" alt="Forest.AI Logo" width="600" height="auto" style="max-width: 100%; height: auto;">
 </p>
 
 <p align="center">
@@ -26,13 +26,13 @@ Forest.AI 是一款基于创新 **Tree-like RAG 架构**的本地知识库解决
 ## 📸 产品演示
 
 <p align="center">
-  <img src="./images/demo-main.png" alt="主界面演示" width="800">
+  <img src="./images/demo-main.png" alt="主界面演示" width="800" style="border: 2px solid #000000; border-radius: 8px;">
   <br>
   <em>Forest.AI 主界面 - 现代化的知识管理体验</em>
 </p>
 
 <p align="center">
-  <img src="./images/demo-chat.png" alt="智能问答演示" width="800">
+  <img src="./images/demo-chat.png" alt="智能问答演示" width="800" style="border: 2px solid #000000; border-radius: 8px;">
   <br>
   <em>智能问答界面 - 精准理解，智能回答</em>
 </p>
