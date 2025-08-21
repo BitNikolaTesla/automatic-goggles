@@ -9,11 +9,13 @@
   <a href="#简体中文">简体中文</a> • 
   <a href="#日语">日语</a>
 </p>
-
 <p align="center">
   <a href="https://trendshift.io/repositories/13584">
     <img src="https://trendshift.io/api/badge/repositories/13584" alt="Trending">
   </a>
+</p>
+
+<p align="center">
   <img src="https://img.shields.io/badge/Vue-3.0-green" alt="Vue 3">
   <img src="https://img.shields.io/badge/License-MIT-blue" alt="License">
   <img src="https://img.shields.io/badge/Build-Passing-brightgreen" alt="Build Status">
