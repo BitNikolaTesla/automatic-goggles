@@ -34,7 +34,7 @@ Forest.AI 是一款基于创新 **Tree-like RAG 架构**的本地知识库解决
 </p>
 
 <p align="center">
-  <img src="./images/技术框架图.png" alt="智能问答演示" width="800" style="border: 2px solid #000000; border-radius: 8px;">
+  <img src="./images/frame.png" alt="智能问答演示" width="800" style="border: 2px solid #000000; border-radius: 8px;">
   <br>
   <em>系统架构</em>
 </p>
