@@ -21,11 +21,11 @@
   <img src="https://img.shields.io/badge/Build-Passing-brightgreen" alt="Build Status">
 </p>
 
-## 📖 项目介绍
+## ✨ 项目介绍
 
 Forest.AI 是一款基于创新 **Tree-like RAG 架构**的本地知识库解决方案，专为高效处理多源异构数据而设计。通过将复杂数据转化为标准化的结构树，系统提供精准的知识检索与智能问答能力，显著提升企业知识管理效率。
 
-## 📸 产品演示
+## ✨ 产品演示
 
 <p align="center">
   <img src="./images/demo-main.png" alt="主界面演示" width="800" style="border: 2px solid #000000; border-radius: 8px;">
