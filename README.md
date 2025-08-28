@@ -1,7 +1,7 @@
 # Forest.AI - 智能知识库解决方案
 
 <p align="center">
-  <img src="./logo.png" alt="Forest.AI Logo" width="600" height="auto" style="max-width: 100%; height: auto;">
+  <img src="./images/logo.gif" alt="Forest.AI Logo" width="600" height="auto" style="max-width: 100%; height: auto;">
 </p>
 
 <p align="center">
