@@ -7,7 +7,10 @@
 <p align="center">
   <a href="#english">English</a> • 
   <a href="#简体中文">简体中文</a> • 
-  <a href="#日语">日语</a>
+  <a href="#日语">日本語</a>
+  <a href="#日语">한국어</a>
+  <a href="#日语">Français</a>
+  
 </p>
 <p align="center">
   <a href="https://trendshift.io/repositories/13584">
