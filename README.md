@@ -30,13 +30,13 @@
 <p align="center">
   <img src="./images/demo-main.png" alt="主界面演示" width="1200" style="border: 2px solid #000000; border-radius: 8px;">
   <br>
-  <em>Forest.AI 主界面 - 现代化的知识管理体验</em>
+  <em>Forest.AI 主界面 </em>
 </p>
 
 <p align="center">
   <img src="./images/frame3.png" alt="智能问答演示" width="1200" style="border: 2px solid #000000; border-radius: 8px;">
   <br>
-  <em>系统架构</em>
+  <em>Forest.AI 系统架构</em>
 </p>
 
 ## 📊 性能指标
