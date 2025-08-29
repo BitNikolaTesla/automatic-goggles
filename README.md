@@ -7,8 +7,8 @@
 <p align="center">
   <a href="#english">English</a> • 
   <a href="#简体中文">简体中文</a> • 
-  <a href="#日语">日本語</a>
-  <a href="#日语">한국어</a>
+  <a href="#日语">日本語</a>•
+  <a href="#日语">한국어</a>•
   <a href="#日语">Français</a>
   
 </p>
