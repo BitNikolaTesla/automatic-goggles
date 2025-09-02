@@ -31,7 +31,7 @@
 ## ✨ 产品演示
 
 <p align="center">
-  <img src="./images/demo-main.png" alt="主界面演示" width="1200" style="border: 2px solid #000000; border-radius: 8px;">
+  <img src="./images/a1.png" alt="主界面演示" width="1200" style="border: 2px solid #000000; border-radius: 8px;">
   <br>
   <em>Forest.AI 主界面 </em>
 </p>
