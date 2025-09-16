@@ -1,4 +1,4 @@
-# Forest.AI - 智能知识库解决方案
+# Cubular.AI - 智能知识库解决方案
 
 <p align="center">
   <img src="./images/logo-gif.gif" alt="Cubular.AI Logo" width="1200" height="auto" style="max-width: 100%; height: auto;">
