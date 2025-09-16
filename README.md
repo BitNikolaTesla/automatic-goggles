@@ -1,7 +1,7 @@
 # Forest.AI - 智能知识库解决方案
 
 <p align="center">
-  <img src="./images/logo2.gif" alt="Forest.AI Logo" width="1200" height="auto" style="max-width: 100%; height: auto;">
+  <img src="./images/logo-gif.gif" alt="Cubular.AI Logo" width="1200" height="auto" style="max-width: 100%; height: auto;">
 </p>
 
 <p align="center">
@@ -25,7 +25,7 @@
 </p>
 
 ## ✨ 概述
-我们推出 **Forest.AI**，一个为组织知识建模和推理而设计的实验性系统。与传统检索方法不同，Forest.AI 采用 **树状检索增强生成（Tree-like RAG）** 架构，将异构数据构建为统一的层次化表示。这种方法通过从语义搜索转向 **结构化知识推理**，实现了更准确、可验证的问答能力。
+我们推出 **Cubular.AI**，一个为组织知识建模和推理而设计的实验性系统。与传统检索方法不同，Forest.AI 采用 **树状检索增强生成（Tree-like RAG）** 架构，将异构数据构建为统一的层次化表示。这种方法通过从语义搜索转向 **结构化知识推理**，实现了更准确、可验证的问答能力。
 
 
 ## ✨ 产品演示
@@ -33,13 +33,13 @@
 <p align="center">
   <img src="./images/a1.png" alt="主界面演示" width="1200" style="border: 2px solid #000000; border-radius: 8px;">
   <br>
-  <em>Forest.AI 主界面 </em>
+  <em>Cubular.AI 主界面 </em>
 </p>
 
 <p align="center">
-  <img src="./images/frame3.png" alt="智能问答演示" width="1200" style="border: 2px solid #000000; border-radius: 8px;">
+  <img src="./images/frame4.png" alt="智能问答演示" width="1200" style="border: 2px solid #000000; border-radius: 8px;">
   <br>
-  <em>Forest.AI 系统架构</em>
+  <em>Cubular.AI 系统架构</em>
 </p>
 
 ## 📊 性能指标
